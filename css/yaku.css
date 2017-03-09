@@ -1,0 +1,131 @@
+/* TREE */
+
+#category {
+    font-size: 12px;
+    font-family: tahoma, verdana;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+#category .root {
+    position: relative;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #222;
+    font-weight: 400;
+}
+
+#category ul {
+    display: block;
+    list-style: none;
+    margin: 0;
+    position: relative;
+    padding: 3px 0 0 11px;
+    background: url(../img/line_tree_vr.gif) repeat-y 11px -1px;
+    zoom: 1;
+}
+
+#category ul li {
+    position: relative;
+    padding: 3px 0 2px 8px;
+    background: url(../img/line_tree_hr.gif) no-repeat 1px 5px !important;
+    white-space: nowrap;
+    list-style: none;
+}
+
+#category ul li a,
+#category ul li span.tree_label {
+    padding-left: 23px;
+    background: url('../img/icon_folder.png') no-repeat 0 center;
+    color: #333;
+    text-decoration: none;
+    position: relative;
+    top: 0;
+    left: 16px;
+    _left/**/
+    : 0;
+}
+
+#category ul li a.folder_open {
+    background: url('../img/icon_folder_open.png') no-repeat 0 center;
+}
+
+#category ul#sdk>li>a {
+    line-height: 23px;
+}
+
+#category ul li a:hover {
+    text-decoration: underline
+}
+
+#category ul li button {
+    display: inline-block;
+    position: relative;
+    *top: -2px;
+    _top: -2px;
+    _left/**/
+    : -16px;
+    width: 13px;
+    *width: 17px;
+    height: 13px;
+    *height: 17px;
+    margin: 0 -17px 0 0;
+    *margin: 0 -17px -2px -2px;
+    border: none;
+    background: url(../img/btn_tree_collapse.gif) no-repeat;
+    *font-family: Sans-serif;
+    *font-size: 0;
+    *line-height: 0;
+    text-indent: -10000px;
+    *text-indent: 0;
+    cursor: pointer;
+    _cursor/**/
+    : hand;
+}
+
+#category ul li button.minus {
+    background-position: 0 -13px;
+    *background-position: 2px -11px;
+}
+
+#category ul li button.plus {
+    background-position: 0 0;
+    *background-position: 2px 2px;
+}
+
+#category ul li.tree_last {
+    background: url(../img/line_tree_last_hr.gif) no-repeat 0 5px !important;
+}
+
+#category .selected {
+    color: #1B87D4;
+    font-weight: 400;
+}
+
+#category .moveSpace {
+    border: 1px dotted #CC0000;
+    height: 2px;
+    width: 200px;
+}
+
+#category .gExplorerCtrl:after {
+    display: block;
+    clear: both;
+    height: 0;
+    content: " ";
+    font-size: 0;
+    line-height: 0;
+}
+
+#category .gExplorerCtrl {
+    margin: 10px 0 0;
+    padding: 7px;
+    overflow: hidden;
+    border-width: 1px 1px 0;
+    border-style: solid solid none;
+    border-color: #DADADC #DADADC -moz-use-text-color;
+    background: none repeat scroll 0 0 #F5F3F4;
+}
+
+#category .directory {}

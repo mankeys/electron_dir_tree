@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Hello World!</title>
-    <link type="text/css" rel="stylesheet" href="./css/yaku.css" />
     <script type="text/javascript" src="./js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="./js/jquery.yakutree.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
@@ -16,40 +15,14 @@
             Dialog
         } = require('electron');
 
-        const gDebug = true;
+        let gDebug = true;
         let sortedFolderList = [];
         const fs = require('fs'); // Load the File System to execute our common tasks (CRUD)
-        let util = { //util :start
-            sortByFileExpOrder: function(mObjA, mObjB) { //windows file explorer 처럼 소팅한다.
-                let numA = mObjA.match(/^\d+/) != null ? parseInt(mObjA.match(/^\d+/)[0]) : null;
-                let numB = mObjB.match(/^\d+/) != null ? parseInt(mObjB.match(/^\d+/)[0]) : null;
-                if (numA != null && numB != null) {
-                    if (numA < numB) { //num 비교
-                        return -1;
-                    } else {
-                        return 1;
-                    }
-                } else if (numA == null && numB == null) {
-                    if (mObjA < mObjB) { //string 비교
-                        return -1;
-                    } else {
-                        return 1;
-                    }
-                } else if (numA == null || numB == null) { //둘중 하나만 string
-                    if (numB == null) { //numA가 숫자인경우 앞으로
-                        return -1;
-                    } else {
-                        return 1;
-                    }
-                }
-            }
-
-        }; //util :end
-
 
         $(function() {
-            //'E:/work_electron' 'c:/svc'  process.cwd()
-            setFolderList('e:/');
+            setFolderList();
+            console.log($('.root').text());
+
         });
 
         function printFile() {
@@ -64,91 +37,30 @@
         }
 
 
-        function setFolderList(rootDir) {
-            let idx = 0;
-            let subCallCnt = 0;
-            let subDoneCnt = 0;
-            let dirs = fs.readdirSync(rootDir);
-            for (let dir of dirs) {
-                let crDir = rootDir + '/' + dir;
-                let stat = null;
-                let fdType = '';
-                let fdLv = 0;
-                try {
-                    stat = fs.statSync(crDir);
-                } catch (ex) {
-                    console.log('NG ..', ex);
-                    continue;
-                }
-                if (stat.isDirectory()) {
-                    //console.log('==root dir', dir);
-                    fdtype = 'folder';
-                    sortedFolderList.push({
-                        fdId: idx,
-                        fdLv: fdLv,
-                        fdFid: null,
-                        fdNm: dir,
-                        fdTp: fdType
-                    });
-                    subCallCnt++;
-                    pushSubDir(crDir, fdLv, idx);
-                    idx++
-                } else {
-                    fdType = 'file';
-                }
-                //console.log('sortedFolderList', sortedFolderList.length);
-            }
-            chkDoneAndDrawYakuTree();
-            return;
-
-            function pushSubDir(ptDir, crLv, crFid) { //nested, recursive
-                idx++;
-                crLv++;
-                let dirs = fs.readdirSync(ptDir);
-                dirs.sort(function(objA, objB) {
-                    return util.sortByFileExpOrder(objA, objB);
-                });
+        function setFolderList() {
+            var mDir = process.cwd(); //'E:\\'
+            var idx = 0;
+            fs.readdir(mDir, (err, dirs) => {
                 for (let dir of dirs) {
-                    let crDir = ptDir + '/' + dir;
-                    let stat = null;
-                    let fdType = '';
-                    try {
-                        stat = fs.statSync(crDir);
-                    } catch (ex) {
-                        console.log('NG ..', ex);
-                        continue;
-                    }
-
-                    if (stat.isDirectory()) {
-                        //                        console.log('-sub dir', dir, crLv, idx);
-                        fdtype = 'folder';
-                        sortedFolderList.push({
-                            fdId: idx,
-                            fdLv: crLv,
-                            fdFid: crFid,
-                            fdNm: dir,
-                            fdTp: fdType
-                        });
-                        //                        subCallCnt++;
-                        //                        pushSubDir(crDir, crLv, idx); //recursive invoke 에 idx++이 포함되어 잇다.
-                        idx++;
-                    } else {
-                        fdType = 'file';
-                    }
+                    console.log('dir', dir);
+				    var stat = fs.statSync(filepath);
+					var fdType='';
+					if (stat.isDirectory()) {
+						fdtype = 'folder';
+						sortedFolderList.push({
+							fdId: idx++,
+							fdLv: 0,
+							fdNm: dir,
+							fdTp: fdType
+						});
+					} else {
+						fdType='file';	
+					}
+                    console.log('sortedFolderList', sortedFolderList.length);
                 }
-                subDoneCnt++;
-                //                chkDoneAndDrawYakuTree();
-                return;
-            }
+                drawPopHtmlMain('#folderListUL');
+            });
 
-            function chkDoneAndDrawYakuTree() { //nested
-                if (subDoneCnt == subCallCnt) {
-                    console.log(subDoneCnt, '//', subCallCnt);
-                    //                    console.log('sortedFolderList', sortedFolderList);
-                    drawPopHtmlMain('#folderListUL');
-                } else {}
-
-            }
         }
 
         function showYakuTree() {
@@ -169,17 +81,17 @@
                 btnCallback: function(type, $source, $target) {
                     switch (type) {
                         case 'moveUp':
-                            this.moveAnimation($source, $target, 'revert');
+                            //this.moveAnimation(  $source, $target, 'revert' );
                             break;
                     }
                 }
             });
+
         }
 
         //Html folder Draw : main		
         function drawPopHtmlMain(mPlaceHolder) {
             console.log('mPlaceHolder:', mPlaceHolder, 'sortedFolderList.length:', sortedFolderList.length);
-            $(mPlaceHolder).html(''); //init
             var htmlLi = null;
             var currFdId = 0;
             var currFdLv = 0;
@@ -192,24 +104,24 @@
                 isLast = isLastElemAtSameLv(ix, sortedFolderList[ix].fdFid, sortedFolderList[ix].fdLv);
                 hasChild = hasChildAtCurrFdId(currFdId);
                 htmlLi = getFolderElemHtml_nested(sortedFolderList[ix], isLast, hasChild);
-                // console.log('htmlLi:', htmlLi);
+                console.log('htmlLi:', htmlLi);
 
                 if (ix == 0) { //시작점은 그냥 append
                     $(mPlaceHolder).append(htmlLi);
                 } else if (currFdLv == 0) { //currFdLv == prevFdLv && 
                     $(mPlaceHolder).append(htmlLi); //최상위에 li를 붙인다.
-                    //                    if (gDebug) console.log('currFdLv 0 eq:', currFdLv, sortedFolderList[ix].fdNm);
+                    if (gDebug) console.log('currFdLv 0 eq:', currFdLv, sortedFolderList[ix].fdNm);
                 } else if (currFdLv > prevFdLv) {
                     var htmlUl = document.createElement('ul');
                     $(htmlUl).append(htmlLi);
                     $(mPlaceHolder).find('li').last().append(htmlUl); //가장 최근만든 li안에 ul만들고 li를 넣는다.
-                    //                    if (gDebug) console.log('currFdLv more:', currFdLv, sortedFolderList[ix].fdNm);
+                    //                if(gDebug)console.log('currFdLv more:', currFdLv, sortedFolderList[ix].fdNm);
                 } else if (currFdLv < prevFdLv) {
                     $(mPlaceHolder).find('li[id=' + sortedFolderList[ix].fdFid + '] ul').eq(0).append(htmlLi); //부모fdId로 ul를 찾고  li를 넣는다.
-                    //                    if (gDebug) console.log('currFdLv less:', currFdLv, sortedFolderList[ix].fdNm);
+                    //                if(gDebug)console.log('currFdLv less:', currFdLv, sortedFolderList[ix].fdNm);
                 } else if (currFdLv == prevFdLv) {
                     $(mPlaceHolder).find('li[id=' + sortedFolderList[ix].fdFid + '] ul').eq(0).append(htmlLi); //부모fdId로 ul를 찾고  li를 넣는다.
-                    //                    if (gDebug) console.log('currFdLv eq:', currFdLv, sortedFolderList[ix].fdNm);
+                    //                if(gDebug)console.log('currFdLv eq:', currFdLv, sortedFolderList[ix].fdNm);
                 }
 
                 var nextLv = 0;
@@ -218,7 +130,6 @@
                 } //제일 마지막 노드 처리 , 제일 마지막이면 nextLv=0
                 prevFdLv = sortedFolderList[ix].fdLv;
             } //ix:e
-            applyYakuTree();
             return;
             //mFdFid를 부모폴더id로 하는 것이 있으면 true, 아니면 false
             function hasChildAtCurrFdId(mFdFid) { //nested
@@ -240,25 +151,12 @@
                 return true;
             }
 
-            // function getFolderElemHtml_nested(mFolderVO) { //nested
-            //     var mHtml = $('#liFolderElemHidden_yaku').children().clone();
-            //     mHtml.attr('id', mFolderVO.fdId);
-            //     mHtml.find('a').text(mFolderVO.fdNm);
-            //     return mHtml;
-            // }
-            function getFolderElemHtml_nested(mFolderVO, mIsLast, mHasChild) { //nested
+            function getFolderElemHtml_nested(mFolderVO) { //nested
                 var mHtml = $('#liFolderElemHidden_yaku').children().clone();
                 mHtml.attr('id', mFolderVO.fdId);
-                if (mIsLast) {
-                    mHtml.addClass('tree_last');
-                }
-                // if (!mHasChild) {
-                //     mHtml.find('.folder_pre').remove();
-                // }
                 mHtml.find('a').text(mFolderVO.fdNm);
                 return mHtml;
             }
-
             //야쿠 tree를 적용한다.
             function applyYakuTree() { //nested  folderListUL
                 $(mPlaceHolder).yakutree({
@@ -290,7 +188,7 @@
 </head>
 
 <body>
-    <h1>file tree show by mankeys</h1>
+    <h1>Hello World!</h1>
 
     <script>
         document.write('We are using node : ');
@@ -309,7 +207,7 @@
 
     <div id="category">
         <div class="directory">
-            <div class="root"> 폴더구조 </div>
+            <div class="root"> 문서함 </div>
             <ul id="folderListUL">
 
             </ul>
@@ -317,7 +215,7 @@
     </div>
 
     <ul id="liFolderElemHidden_yaku" style="display:none;">
-        <li class="collection folder" id="" style="margin-left:0px">
+        <li class="collection folder none_text_select" id="" style="margin-left:0px">
             <a href="#"></a>
         </li>
     </ul>
