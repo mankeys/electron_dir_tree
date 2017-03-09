@@ -131,8 +131,7 @@
             drawFolderHtmlMain('#folderListUL');
             //            folderEvt.unbind();
             folderEvt.bind();
-            pmBtnEvt.miBind();
-            pmBtnEvt.plBind();
+            pmBtnEvt.bind();
             console.log('current Idx', gInfo.idx);
             return;
 
@@ -207,26 +206,24 @@
         }
 
         let pmBtnEvt = {
-            miBind: function() {
-                $('#folderListUL li.folder button.minus').bind('click', function() {
-                    $(this).parent().find('ul').eq(0).hide();
-                    $(this).parent().find('a').eq(0).removeClass('folder_open');
+            bind: function() {
+                $('#folderListUL li.folder button.toggle').bind('click', function() {
+                    if ($(this).hasClass('minus')) {
+                        console.log('minus');
+                        $(this).parent().find('ul').eq(0).hide();
+                        $(this).parent().find('a').eq(0).removeClass('folder_open');
+                        $(this).parent().find('button').eq(0).removeClass('minus').addClass('plus');
+                    } else if ($(this).hasClass('plus')) {
+                        console.log('plus');
+                        $(this).parent().find('ul').eq(0).show();
+                        $(this).parent().find('a').eq(0).click();
+                        $(this).parent().find('button').eq(0).removeClass('plus').addClass('minus');
+                    }
                 });
             },
-            miUnbind: function() {
-                $('#folderListUL li.folder button.minus').unbind('click');
-            },
-            plBind: function() {
-                $('#folderListUL li.folder button.plus').bind('click', function() {
-                    $(this).parent().find('ul').eq(0).show();
-                    //                    $(this).parent().find('a').eq(0).addClass('folder_open');
-                    $(this).parent().find('a').eq(0).click();
-                });
-            },
-            plUnbind: function() {
-                $('#folderListUL li.folder button.plus').unbind('click');
+            unbind: function() {
+                $('#folderListUL li.folder button.toggle').unbind('click');
             }
-
         }
 
         //클릭시 subFolder를 읽어와서 html을 붙인다.
@@ -247,10 +244,8 @@
             addFolderHtml('.' + clsSubFdUl, idxPre);
             folderEvt.unbind();
             folderEvt.bind();
-            pmBtnEvt.plUnbind();
-            pmBtnEvt.plBind();
-            pmBtnEvt.miUnbind();
-            pmBtnEvt.miBind();
+            pmBtnEvt.unbind();
+            pmBtnEvt.bind();
             //            applyYakuTree('#folderListUL');
             return;
 
